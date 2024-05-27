@@ -5,7 +5,7 @@ help:
 	@echo "install - install dependencies"
 
 install:
-	poetry install --no-root
+	poetry install --only main --no-root
 
 data:
 	$(MAKE) -C data

@@ -1,8 +1,8 @@
 .PHONY: all
 
-all: raw
+all: download
 
-raw: raw/train.csv raw/test.csv
+download: raw/train.csv raw/test.csv
 
 raw/train.csv:
 	mkdir -p raw
