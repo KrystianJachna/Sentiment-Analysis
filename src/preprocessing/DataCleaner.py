@@ -1,5 +1,5 @@
-from sklearn.base import BaseEstimator, TransformerMixin
 from re import sub
+from sklearn.base import BaseEstimator, TransformerMixin
 from .utils import *
 
 
@@ -19,9 +19,11 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         self.replace_hashtag = replace_hashtag
         self.replace_emoji = replace_emoji
         self.replace_numbers = replace_numbers
+        self.replace_email = replace_email
 
-    def transform(self, data:str, y:int=None) -> str:
+    def transform(self, data: str, y: int = None) -> str:
         data = data.lower()
+        data = sub(EMAIL_REGEX, "email", data) if self.replace_email else data
         data = sub(URL_REGEX, "url", data) if self.replace_url else data
         data = sub(MENTION_REGEX, "mention", data) if self.replace_mention else data
         data = sub(HASHTAG_REGEX, "hashtag", data) if self.replace_hashtag else data
@@ -31,9 +33,8 @@ class DataCleaner(BaseEstimator, TransformerMixin):
                 data = data.replace(emoji, meaning)
 
         data = sub(NUMBER_REGEX, "number", data) if self.replace_numbers else data
-        data = sub(EMAIL_REGEX, "email", data) if self.replace_email else data
+        data = ' '.join(data.split())
         return data.strip()
 
-
-    def fit(self, data:str , y:int=None) -> 'DataCleaner':
+    def fit(self, data: str, y: int = None) -> 'DataCleaner':
         return self
