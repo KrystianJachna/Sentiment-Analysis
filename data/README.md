@@ -2,17 +2,17 @@
 
 ## Data Description
 
-The data in this directory originates from Amazon reviews and is used for sentiment analysis. 
-It consists of 3,000,000 training samples and 650,000 testing samples. 
-The reviews are labeled with a number from 1 to 5, representing the number of stars given by the reviewer. 
-For our binary classifier, we will treat reviews with 1-2 stars as negative and reviews with 4-5 stars as positive. 
-Reviews with 3 stars will not be used in the model. 
+The data in this directory originates from Amazon reviews and is used for sentiment analysis.
+It consists of 3,000,000 training samples and 650,000 testing samples.
+The reviews are labeled with a number from 1 to 5, representing the number of stars given by the reviewer.
+For our binary classifier, we will treat reviews with 1-2 stars as negative and reviews with 4-5 stars as positive.
+Reviews with 3 stars will not be used in the model.
 
 ## Data Structure
 
-The raw data is stored in CSV files (`raw/train.csv` and `raw/test.csv`). 
-Each file contains 3 columns: class index (ranging from 1 to 5), review title, and review text. 
-For example, a row in the data might look like this: 
+The raw data is stored in CSV files (`raw/train.csv` and `raw/test.csv`).
+Each file contains 3 columns: class index (ranging from 1 to 5), review title, and review text.
+For example, a row in the data might look like this:
 
 ```"1","mens ultrasheer","This model may be ok for sedentary types, but I'm active and get around alot in my job - consistently found these stockings rolled up down by my ankles! Not Good!! Solution: go with the standard compression stocking, 20-30, stock #114622. Excellent support, stays up and gives me what I need. Both pair of these also tore as I struggled to pull them up all the time. Good riddance/bad investment!"```
 
