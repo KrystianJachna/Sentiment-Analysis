@@ -6,12 +6,12 @@ def test_data_cleaner():
     text = ("   Hello @user,        check out this  link: https://example.com :) #fun my number is "
             "1234 contact            me at krysti4nape@gmail.com")
     cleaned = cleaner.transform(text)
-    assert cleaned == "hello mention, check out this link: url smile hashtag my number is number contact me at email"
+    assert cleaned == "hello mention check out this link url smile hashtag my number is number contact me at email"
 
 
 def test_data_cleaner_no_replace():
     cleaner = DataCleaner(replace_url=False, replace_mention=False, replace_hashtag=False, replace_emoji=False,
-                          replace_numbers=False, replace_email=False)
+                          replace_numbers=False, replace_email=False, punctuation=False)
     text = ("Hello @user, check out this link: https://example.com :) "
             "#fun my number is 1234 contact me at krysti4nape@gmail.com")
     cleaned = cleaner.transform(text)
@@ -36,4 +36,4 @@ def test_data_cleaner_special_characters():
     cleaner = DataCleaner()
     text = "!@#$%^&*()"
     cleaned = cleaner.transform(text)
-    assert cleaned == text
+    assert cleaned == ''

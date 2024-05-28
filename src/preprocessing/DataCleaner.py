@@ -1,9 +1,14 @@
 from re import sub
 from sklearn.base import BaseEstimator, TransformerMixin
 from .utils import *
+import string
 
 
 class DataCleaner(BaseEstimator, TransformerMixin):
+    """
+    DataCleaner is a class that cleans the text data by replacing URLs, mentions, hashtags, emojis, numbers, and emails
+    with their respective tags. It also removes punctuation and extra spaces from the text.
+    """
 
     def __init__(
         self, *,
@@ -13,6 +18,7 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         replace_emoji: bool = True,
         replace_numbers: bool = True,
         replace_email: bool = True,
+        punctuation: bool = True
     ):
         self.replace_url = replace_url
         self.replace_mention = replace_mention
@@ -20,6 +26,7 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         self.replace_emoji = replace_emoji
         self.replace_numbers = replace_numbers
         self.replace_email = replace_email
+        self.punctuation = punctuation
 
     def transform(self, X: str, y: int = None) -> str:
         return self._clean_test(X)
@@ -39,5 +46,6 @@ class DataCleaner(BaseEstimator, TransformerMixin):
                 text = text.replace(emoji, meaning)
 
         text = sub(NUMBER_REGEX, "number", text) if self.replace_numbers else text
+        text = text.translate(str.maketrans('', '', string.punctuation)) if self.punctuation else text
         text = ' '.join(text.split())
         return text.strip()
