@@ -162,5 +162,5 @@ cython_debug/
 
 # For Mac users
 .DS_Store
-/data/raw/test.csv
-/data/raw/train.csv
+/data/raw/*
+/data/processed/*
