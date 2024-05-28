@@ -24,4 +24,3 @@ EMOJI_MEANING = {
     "8)": "glasses",
     "8|": "sunglasses"
 }
-
