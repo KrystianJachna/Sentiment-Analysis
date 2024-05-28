@@ -1,7 +1,9 @@
-from re import sub
-from sklearn.base import BaseEstimator, TransformerMixin
-from .utils import *
 import string
+from re import sub
+
+from sklearn.base import BaseEstimator, TransformerMixin
+
+from .utils import *
 
 
 class DataCleaner(BaseEstimator, TransformerMixin):
