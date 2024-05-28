@@ -21,20 +21,23 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         self.replace_numbers = replace_numbers
         self.replace_email = replace_email
 
-    def transform(self, data: str, y: int = None) -> str:
-        data = data.lower()
-        data = sub(EMAIL_REGEX, "email", data) if self.replace_email else data
-        data = sub(URL_REGEX, "url", data) if self.replace_url else data
-        data = sub(MENTION_REGEX, "mention", data) if self.replace_mention else data
-        data = sub(HASHTAG_REGEX, "hashtag", data) if self.replace_hashtag else data
-
-        if self.replace_emoji:
-            for emoji, meaning in EMOJI_MEANING.items():
-                data = data.replace(emoji, meaning)
-
-        data = sub(NUMBER_REGEX, "number", data) if self.replace_numbers else data
-        data = ' '.join(data.split())
-        return data.strip()
+    def transform(self, X: str, y: int = None) -> str:
+        return self._clean_test(X)
 
     def fit(self, data: str, y: int = None) -> 'DataCleaner':
         return self
+
+    def _clean_test(self, text: str) -> str:
+        text = text.lower()
+        text = sub(EMAIL_REGEX, "email", text) if self.replace_email else text
+        text = sub(URL_REGEX, "url", text) if self.replace_url else text
+        text = sub(MENTION_REGEX, "mention", text) if self.replace_mention else text
+        text = sub(HASHTAG_REGEX, "hashtag", text) if self.replace_hashtag else text
+
+        if self.replace_emoji:
+            for emoji, meaning in EMOJI_MEANING.items():
+                text = text.replace(emoji, meaning)
+
+        text = sub(NUMBER_REGEX, "number", text) if self.replace_numbers else text
+        text = ' '.join(text.split())
+        return text.strip()
