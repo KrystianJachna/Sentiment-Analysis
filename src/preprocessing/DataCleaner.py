@@ -7,7 +7,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import pandas as pd
 
-from .utils import *
+from .const import *
 nltk.download('stopwords')
 STOP_WORDS = set(stopwords.words('english'))
 
@@ -41,7 +41,7 @@ class DataCleaner(BaseEstimator, TransformerMixin):
 
     def _clean_text(self, X: pd.Series) -> pd.Series:
         X = X.str.lower()
-        
+
         if self.replace_email:
             X = X.apply(self._replace_email)
         if self.replace_url:
@@ -51,19 +51,19 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         if self.replace_hashtag:
             X = X.apply(self._replace_hashtag)
         if self.replace_emoji:
-            X = X.apply(self._replace_emojis)
+            X = X.apply(self._replace_emotes)
         if self.replace_numbers:
             X = X.apply(self._replace_numbers)
-            
+
         X = X.apply(self._remove_stop_words)
-        
+
         if self.punctuation:
             X = X.apply(self._remove_punctuation)
 
         X = X.apply(word_tokenize)
-        
+
         return X.apply(self._remove_short_words)
-    
+
     def _remove_stop_words(self, text: str) -> str:
         return ' '.join([word for word in word_tokenize(text) if word not in STOP_WORDS])
 
@@ -79,9 +79,10 @@ class DataCleaner(BaseEstimator, TransformerMixin):
     def _replace_hashtag(self, text: str) -> str:
         return sub(HASHTAG_REGEX, "hashtag", text)
 
-    def _replace_emojis(self, text: str) -> str:
-        for emoji, meaning in EMOJI_MEANING.items():
-            text = text.replace(emoji, meaning)
+    def _replace_emotes(self, text: str) -> str:
+        for meaning, emojis in EMOJI_MEANING.items():
+            for emoji in emojis:
+                text = text.replace(emoji, meaning)
         return text
 
     def _replace_numbers(self, text: str) -> str:
@@ -89,6 +90,6 @@ class DataCleaner(BaseEstimator, TransformerMixin):
 
     def _remove_punctuation(self, text: str) -> str:
         return text.translate(str.maketrans('', '', string.punctuation))
-    
+
     def _remove_short_words(self, tokens: list[str]) -> str:
         return list(filter(lambda token: len(token) >= self.word_len_threshold, tokens))
