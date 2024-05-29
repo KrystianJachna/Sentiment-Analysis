@@ -1,6 +1,7 @@
+import pandas as pd
 from nltk.stem.porter import PorterStemmer
 from sklearn.base import BaseEstimator, TransformerMixin
-import pandas as pd
+
 
 class Stemmer(BaseEstimator, TransformerMixin):
     """
@@ -15,4 +16,3 @@ class Stemmer(BaseEstimator, TransformerMixin):
 
     def fit(self, data: list[str], y: int = None) -> 'Stemmer':
         return self
-
