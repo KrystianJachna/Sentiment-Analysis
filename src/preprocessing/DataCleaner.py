@@ -30,24 +30,25 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         self.replace_email = replace_email
         self.punctuation = punctuation
 
-    def transform(self, X: str, y: int = None) -> str:
+    def transform(self, X: list[str], y: int = None) -> list[str]:
         return self._clean_test(X)
 
-    def fit(self, data: str, y: int = None) -> 'DataCleaner':
+    def fit(self, X: list[str], y: int = None) -> 'DataCleaner':
         return self
 
-    def _clean_test(self, text: str) -> str:
-        text = text.lower()
-        text = sub(EMAIL_REGEX, "email", text) if self.replace_email else text
-        text = sub(URL_REGEX, "url", text) if self.replace_url else text
-        text = sub(MENTION_REGEX, "mention", text) if self.replace_mention else text
-        text = sub(HASHTAG_REGEX, "hashtag", text) if self.replace_hashtag else text
+    def _clean_test(self, texts: list[str]) -> list[str]:
+        texts = [text.lower() for text in texts]
+        texts = [sub(EMAIL_REGEX, "email", text) if self.replace_email else text for text in texts]
+        texts = [sub(URL_REGEX, "url", text) if self.replace_url else text for text in texts]
+        texts = [sub(MENTION_REGEX, "mention", text) if self.replace_mention else text for text in texts]
+        texts = [sub(HASHTAG_REGEX, "hashtag", text) if self.replace_hashtag else text for text in texts]
 
         if self.replace_emoji:
             for emoji, meaning in EMOJI_MEANING.items():
-                text = text.replace(emoji, meaning)
+                texts = [text.replace(emoji, meaning) for text in texts]
 
-        text = sub(NUMBER_REGEX, "number", text) if self.replace_numbers else text
-        text = text.translate(str.maketrans('', '', string.punctuation)) if self.punctuation else text
-        text = ' '.join(text.split())
-        return text.strip()
+        texts = [sub(NUMBER_REGEX, "number", text) if self.replace_numbers else text for text in texts]
+        texts = [text.translate(str.maketrans('', '', string.punctuation)) if self.punctuation else text for text in texts]
+        texts = [' '.join(text.split()) for text in texts]
+        return [text.strip() for text in texts]
+
