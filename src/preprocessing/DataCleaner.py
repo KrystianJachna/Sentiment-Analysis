@@ -2,16 +2,17 @@ import string
 from re import sub
 
 from sklearn.base import BaseEstimator, TransformerMixin
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import pandas as pd
 
 from .utils import *
+nltk.download('stopwords')
+STOP_WORDS = set(stopwords.words('english'))
 
 
 class DataCleaner(BaseEstimator, TransformerMixin):
-    """
-    DataCleaner is a class that cleans the text data by replacing URLs, mentions, hashtags, emojis, numbers, and emails
-    with their respective tags. It also removes punctuation and extra spaces from the text.
-    """
-
     def __init__(
         self, *,
         replace_url: bool = True,
@@ -20,7 +21,8 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         replace_emoji: bool = True,
         replace_numbers: bool = True,
         replace_email: bool = True,
-        punctuation: bool = True
+        punctuation: bool = True,
+        word_len_threshold: int = 2
     ):
         self.replace_url = replace_url
         self.replace_mention = replace_mention
@@ -29,26 +31,64 @@ class DataCleaner(BaseEstimator, TransformerMixin):
         self.replace_numbers = replace_numbers
         self.replace_email = replace_email
         self.punctuation = punctuation
+        self.word_len_threshold = word_len_threshold
 
-    def transform(self, X: list[str], y: int = None) -> list[str]:
-        return self._clean_test(X)
+    def transform(self, X: pd.Series, y: int = None) -> pd.Series:
+        return self._clean_text(X)
 
-    def fit(self, X: list[str], y: int = None) -> 'DataCleaner':
+    def fit(self, X: pd.Series, y: int = None) -> 'DataCleaner':
         return self
 
-    def _clean_test(self, texts: list[str]) -> list[str]:
-        texts = [text.lower() for text in texts]
-        texts = [sub(EMAIL_REGEX, "email", text) if self.replace_email else text for text in texts]
-        texts = [sub(URL_REGEX, "url", text) if self.replace_url else text for text in texts]
-        texts = [sub(MENTION_REGEX, "mention", text) if self.replace_mention else text for text in texts]
-        texts = [sub(HASHTAG_REGEX, "hashtag", text) if self.replace_hashtag else text for text in texts]
-
+    def _clean_text(self, X: pd.Series) -> pd.Series:
+        X = X.str.lower()
+        
+        if self.replace_email:
+            X = X.apply(self._replace_email)
+        if self.replace_url:
+            X = X.apply(self._replace_url)
+        if self.replace_mention:
+            X = X.apply(self._replace_mention)
+        if self.replace_hashtag:
+            X = X.apply(self._replace_hashtag)
         if self.replace_emoji:
-            for emoji, meaning in EMOJI_MEANING.items():
-                texts = [text.replace(emoji, meaning) for text in texts]
+            X = X.apply(self._replace_emojis)
+        if self.replace_numbers:
+            X = X.apply(self._replace_numbers)
+            
+        X = X.apply(self._remove_stop_words)
+        
+        if self.punctuation:
+            X = X.apply(self._remove_punctuation)
 
-        texts = [sub(NUMBER_REGEX, "number", text) if self.replace_numbers else text for text in texts]
-        texts = [text.translate(str.maketrans('', '', string.punctuation)) if self.punctuation else text for text in texts]
-        texts = [' '.join(text.split()) for text in texts]
-        return [text.strip() for text in texts]
+        X = X.apply(word_tokenize)
+        
+        return X.apply(self._remove_short_words)
+    
+    def _remove_stop_words(self, text: str) -> str:
+        return ' '.join([word for word in word_tokenize(text) if word not in STOP_WORDS])
 
+    def _replace_email(self, text: str) -> str:
+        return sub(EMAIL_REGEX, "email", text)
+
+    def _replace_url(self, text: str) -> str:
+        return sub(URL_REGEX, "url", text)
+
+    def _replace_mention(self, text: str) -> str:
+        return sub(MENTION_REGEX, "mention", text)
+
+    def _replace_hashtag(self, text: str) -> str:
+        return sub(HASHTAG_REGEX, "hashtag", text)
+
+    def _replace_emojis(self, text: str) -> str:
+        for emoji, meaning in EMOJI_MEANING.items():
+            text = text.replace(emoji, meaning)
+        return text
+
+    def _replace_numbers(self, text: str) -> str:
+        return sub(NUMBER_REGEX, "number", text)
+
+    def _remove_punctuation(self, text: str) -> str:
+        return text.translate(str.maketrans('', '', string.punctuation))
+    
+    def _remove_short_words(self, tokens: list[str]) -> str:
+        return list(filter(lambda token: len(token) >= self.word_len_threshold, tokens))
