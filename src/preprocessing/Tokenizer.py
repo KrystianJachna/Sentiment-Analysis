@@ -10,8 +10,8 @@ class Tokenizer(BaseEstimator, TransformerMixin):
     def __init__(self):
         pass
 
-    def transform(self, X: str, y: int = None) -> list[str]:
-        return nltk.word_tokenize(X)
+    def transform(self, X: list[str], y: int = None) -> list[list[str]]:
+        return [nltk.word_tokenize(text) for text in X]
 
     def fit(self, data: str, y: int = None) -> 'Tokenizer':
         return self
