@@ -166,3 +166,5 @@ cython_debug/
 /data/processed/*
 /cache/*
 !/cache/.gitkeep
+
+data/*.csv

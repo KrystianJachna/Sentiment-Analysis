@@ -11,12 +11,11 @@ Reviews with 3 stars will not be used in the model.
 ## Data Structure
 
 The raw data is stored in CSV files (`raw/train.csv` and `raw/test.csv`).
-Each file contains 3 columns: class index (ranging from 1 to 5), review title, and review text.
+Each file contains 3 columns: class index (ranging from 1 to 5), review description, and review text.
 For example, a row in the data might look like this:
 
 ```"1","mens ultrasheer","This model may be ok for sedentary types, but I'm active and get around alot in my job - consistently found these stockings rolled up down by my ankles! Not Good!! Solution: go with the standard compression stocking, 20-30, stock #114622. Excellent support, stays up and gives me what I need. Both pair of these also tore as I struggled to pull them up all the time. Good riddance/bad investment!"```
 
-After preprocessing, the processed data will be stored in the `processed/` directory.
 
 ## Data Source
 
@@ -35,5 +34,3 @@ Or you can run the following command in the `data/` directory:
 ```bash
 make download
 ```
-
-This will download the data from the source and store it in the `raw/` directory.
