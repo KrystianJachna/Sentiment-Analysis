@@ -110,7 +110,7 @@ def gui():
                   "I will never buy this again.",
                   ],
     )
-    iface.launch()
+    iface.launch(share=True)
 
 
 def model():
