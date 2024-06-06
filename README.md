@@ -102,26 +102,26 @@ saved to `model/model.pkl`.
 The preprocessing pipeline consists of the following steps:
 
 1. Data Cleaning:
-  - Convert all words to lowercase.
-  - Remove stopwords.
-  - Remove punctuation.
-  - Remove URLs.
-  - Remove handles (e.g., Twitter handles).
-  - Remove emojis.
-  - Remove extra spaces.
+   - Convert all words to lowercase.
+   - Remove stopwords.
+   - Remove punctuation.
+   - Remove URLs.
+   - Remove handles (e.g., Twitter handles).
+   - Remove emojis.
+   - Remove extra spaces.
 
 2. Stemming:
-  - Reduce words to their root form using a stemming algorithm.
+   - Reduce words to their root form using a stemming algorithm.
 
 3. Vectorization:
-  - Convert text into a matrix of token counts.
-  - Set the ngram_range parameter to (1, 2) to include both individual words and pairs of consecutive words.
-  - Use a predefined constant MAX_FEATURES to limit the number of most frequent words, discarding less frequent words.
+   - Convert text into a matrix of token counts.
+   - Set the ngram_range parameter to (1, 2) to include both individual words and pairs of consecutive words.
+   - Use a predefined constant MAX_FEATURES to limit the number of most frequent words, discarding less frequent words.
 
 4. TF-IDF Transformation:
-  - Transform the matrix of token counts into a normalized TF-IDF representation.
-  - This step reduces the importance of frequently occurring words and increases the importance of rarely occurring
-    words, which could be more informative.
+   - Transform the matrix of token counts into a normalized TF-IDF representation.
+   - This step reduces the importance of frequently occurring words and increases the importance of rarely occurring
+     words, which could be more informative.
 
 ### Classifier
 
