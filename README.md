@@ -123,7 +123,7 @@ The preprocessing pipeline consists of:
 ### Classifier
 
 The model uses a Logistic Regression classifier with the following hyperparameters after testing different values in
-`/notebooks/model_experimentation.ipynb`:
+[model_experiments.ipynb](notebooks/model_experiments.ipynb):
 
 - `C`: 7.9
 - `penalty`: 'l2'
