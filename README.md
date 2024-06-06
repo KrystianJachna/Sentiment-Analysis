@@ -26,7 +26,7 @@ This is a simple sentiment analysis project written in Python. The sentiment is 
 negative with Logistic Regression model. It
 uses [Amazon Review Data](https://www.kaggle.com/datasets/bittlingmayer/amazonreviews) dataset for training and testing
 the model. More information about the dataset can be found [here](data/README.md). Data analysis and parameter tuning
-were performed in Jupyter notebooks, which can be found in the `notebooks` directory.
+were performed in Jupyter notebooks, which can be found in the [notebooks'](notebooks) directory.
 
 ## Installation and Setup
 
