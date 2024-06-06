@@ -8,9 +8,9 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
+from const import MAX_FEATURES, CACHE_DIR, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH
 from preprocessing.DataCleaner import DataCleaner
 from preprocessing.Stemmer import Stemmer
-from const import MAX_FEATURES, CACHE_DIR, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH
 
 
 def load_data(path: Path) -> pd.DataFrame:
@@ -34,6 +34,7 @@ def get_pipeline():
         memory=CACHE_DIR
     )
 
+
 def test_model(model):
     print("\n\nTesting model...")
     test_data = load_data(TEST_DATA_PATH)
@@ -45,14 +46,14 @@ def test_model(model):
     print(f"Confusion Matrix:\n{metrics.confusion_matrix(test_data['label'], y_pred)}")
 
 
-
 def save_model(model):
     print(f"\n\nSaving model to {MODEL_PATH}")
     with open(MODEL_PATH, 'wb') as file:
         pickle.dump(model, file)
 
+
 def gui():
-    pass
+    pass # TODO: Implement gradio GUI
 
 
 if __name__ == '__main__':
@@ -61,6 +62,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.mode == 'model':
+        if not Path(TRAIN_DATA_PATH).exists() or not Path(TEST_DATA_PATH).exists():
+            raise FileNotFoundError(
+                "Training or testing data not found. Download the data using 'make download' and try again.")
         train_data = load_data(TRAIN_DATA_PATH)
         pipeline = get_pipeline()
         print("\n\nFitting pipeline...")
