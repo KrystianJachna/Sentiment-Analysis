@@ -101,11 +101,14 @@ def gui():
         raise FileNotFoundError("Model not found. Train the model using 'make model' and try again.")
     model = load_model()
     iface = gr.Interface(
-        fn=lambda review: "Positive" if classify_review(model, review) == 1 else "Negative",
+        fn=lambda review: "Positive ✅" if classify_review(model, review) == 1 else "Negative ⛔",
         inputs=gr.Textbox(lines=2, placeholder="Enter a review here..."),
         outputs="text",
         title="Sentiment Analysis",
         description="Enter a review and get its sentiment prediction.",
+        examples=["Definitely worth the price.", "This product is amazing!", "I hate this product!",
+                  "I will never buy this again.",
+                  ],
     )
     iface.launch()
 
