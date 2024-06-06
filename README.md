@@ -64,7 +64,8 @@ make gui
 ```
 
 This command starts a Gradio-based GUI, allowing users to input a review and get a sentiment prediction. Access the GUI
-in your browser at the URL displayed in the terminal (default: http://127.0.0.1:7860). Additionally, with the share
+in your browser at the URL displayed in the terminal (default: [http://127.0.0.1:7860](http://127.0.0.1:7860)).
+Additionally, with the share
 option set to True, the model is also hosted on a public URL, which is displayed in the terminal.
 
 ![GUI](assets/gradio.png)
@@ -87,7 +88,8 @@ To train and test the model, use the following command:
 make model
 ```
 
-This command trains and tests the model using `data/train.csv` and `data/test.csv,` saving the trained model to `model/model.pkl`.
+This command trains and tests the model using `data/train.csv` and `data/test.csv,` saving the trained model
+to `model/model.pkl`.
 
 ## Model Details
 
@@ -122,18 +124,20 @@ The model uses a Logistic Regression classifier with the following hyperparamete
 
 The model was evaluated using the following metrics:
 
-| Metric | Value |
-----|
-| Accuracy | 0.8877980769230769 |
+| Metric    | Value              |
+|-----------|--------------------|
+| Accuracy  | 0.8877980769230769 |
 | Precision | 0.8867523580472798 |
-| Recall | 0.88915 |
-| F1 Score | 0.887949560498019 |
+| Recall    | 0.88915            |
+| F1 Score  | 0.887949560498019  |
 
-Confusion Matrix:
+### Confusion Matrix
 
-| | Predicted Negative | Predicted Positive |
-------|
-| Actual Negative | 230476 | 29524 |
+|                 | Predicted Negative | Predicted Positive |
+|-----------------|--------------------|--------------------|
+| Actual Negative | 230476             | 29524              |
+| Actual Positive | 28821              | 231179             |
+
 | Actual Positive | 28821 | 231179 |
 
 ## License
