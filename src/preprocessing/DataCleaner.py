@@ -8,7 +8,11 @@ from nltk.tokenize import word_tokenize
 import pandas as pd
 
 from .const import *
-nltk.download('stopwords')
+# Check if the stopwords corpus is available
+try:
+    nltk.corpus.stopwords.words('english')
+except LookupError:
+    nltk.download('stopwords')
 STOP_WORDS = set(stopwords.words('english'))
 
 

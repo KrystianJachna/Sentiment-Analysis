@@ -1,4 +1,4 @@
-.PHONY: data install help
+.PHONY: data install help model
 
 help:
 	@echo "download - download data"
@@ -9,3 +9,6 @@ install:
 
 download:
 	$(MAKE) -C data
+
+model:
+	poetry run python src/main.py model
