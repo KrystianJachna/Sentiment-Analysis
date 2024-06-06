@@ -17,6 +17,20 @@ STOP_WORDS = set(stopwords.words('english'))
 
 
 class DataCleaner(BaseEstimator, TransformerMixin):
+    """
+    DataCleaner class that preprocesses the input text by cleaning the text.
+    The following preprocessing steps are applied:
+    1. Replace email addresses with 'email'
+    2. Replace URLs with 'url'
+    3. Replace mentions with 'mention'
+    4. Replace hashtags with 'hashtag'
+    5. Replace emojis with their meanings
+    6. Replace numbers with 'number'
+    7. Remove stopwords
+    8. Remove punctuation
+    9. Tokenize the text
+    10. Remove short words based on the word_len_threshold
+    """
     def __init__(
         self, *,
         replace_url: bool = True,

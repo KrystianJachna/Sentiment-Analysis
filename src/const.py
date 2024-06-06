@@ -1,6 +1,5 @@
 from pathlib import Path
 
-# Define the path to the data directory
 data = Path('data')
 model = Path('model')
 
