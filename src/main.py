@@ -24,7 +24,7 @@ def load_data(path: Path) -> pd.DataFrame:
     Load data from the given path and return a DataFrame.
     Preprocess the data by removing neutral reviews and converting the labels to binary.
     """
-    print(f"\nLoading data from {path}")
+    print(f"Loading data from {path}")
     data = pd.read_csv(path, names=['label', 'review'], usecols=[0, 2])
     data = data[data['label'] != 3]
     data['label'] = data['label'].apply(lambda x: 0 if x < 3 else 1)
@@ -40,7 +40,7 @@ def get_pipeline():
     4. TfidfTransformer: Transform the count matrix to a normalized tf-idf representation.
     5. LogisticRegression: Train a logistic regression model to classify the reviews.
     """
-    print("\n\nCreating pipeline...")
+    print("Creating pipeline...")
     return Pipeline([
         ('cleaner', DataCleaner()),
         ('stemmer', Stemmer()),
@@ -57,7 +57,7 @@ def test_model(model):
     """
     Test the model using the test data and print the accuracy, precision, recall, f1 score, and confusion matrix.
     """
-    print("\n\nTesting model...")
+    print("Testing model...")
     test_data = load_data(TEST_DATA_PATH)
     y_pred = model.predict(test_data['review'])
     print(f"Accuracy: {metrics.accuracy_score(test_data['label'], y_pred)}")
@@ -71,7 +71,7 @@ def save_model(model):
     """
     Save the model to the MODEL_PATH using pickle.
     """
-    print(f"\n\nSaving model to {MODEL_PATH}")
+    print(f"Saving model to {MODEL_PATH}")
     with open(MODEL_PATH, 'wb') as file:
         pickle.dump(model, file)
 
@@ -113,7 +113,7 @@ def gui():
     iface.launch(share=True)
 
 
-def model():
+def train_model():
     """
     Train the model using the training data and save it to the MODEL_PATH.
     """
@@ -122,7 +122,7 @@ def model():
             "Training or testing data not found. Download the data using 'make download' and try again.")
     train_data = load_data(TRAIN_DATA_PATH)
     pipeline = get_pipeline()
-    print("\n\nFitting pipeline...")
+    print("Fitting pipeline...")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         pipeline.fit(train_data['review'], train_data['label'])
@@ -133,12 +133,21 @@ def model():
 # Run the model or GUI based on the argument provided
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", help="Specify 'model' to train and save the model, or 'gui' to run the GUI.")
+    parser.add_argument("mode", help="Specify 'model' to train and save the model, 'gui' to run the GUI, or 'predict' to classify a review.")
+    parser.add_argument("--review", help="Review text to predict sentiment for, used with 'predict' mode.")
     args = parser.parse_args()
 
     if args.mode == 'model':
-        model()
+        train_model()
     elif args.mode == 'gui':
         gui()
+    elif args.mode == 'predict':
+        if args.review is None:
+            print("Please provide a review for prediction.")
+        else:
+            model = load_model()
+            prediction = classify_review(model, args.review)
+            sentiment = "Positive :)" if prediction == 1 else "Negative :("
+            print(f"Review: {args.review}\nSentiment: {sentiment}")
     else:
-        print("Invalid argument. Please specify either 'model' or 'gui'.")
+        print("Invalid argument. Please specify either 'model', 'gui', or 'predict'.")
