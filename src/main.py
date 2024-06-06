@@ -2,11 +2,13 @@ import argparse
 import pickle
 from pathlib import Path
 
+import gradio as gr
 import pandas as pd
 from sklearn import metrics
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
+import warnings
 
 from const import MAX_FEATURES, CACHE_DIR, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH
 from preprocessing.DataCleaner import DataCleaner
@@ -52,8 +54,42 @@ def save_model(model):
         pickle.dump(model, file)
 
 
+def load_model():
+    print(f"Loading model from {MODEL_PATH}")
+    with open(MODEL_PATH, 'rb') as file:
+        return pickle.load(file)
+
+
+def classify_review(model, review):
+    review_series = pd.Series([review])
+    return model.predict(review_series)[0]
+
+
 def gui():
-    pass # TODO: Implement gradio GUI
+    if not Path(MODEL_PATH).exists():
+        raise FileNotFoundError("Model not found. Train the model using 'make model' and try again.")
+    model = load_model()
+    iface = gr.Interface(
+        fn=lambda review: "Positive" if classify_review(model, review) == 1 else "Negative",
+        inputs=gr.Textbox(lines=2, placeholder="Enter a review here..."),
+        outputs="text",
+        title="Sentiment Analysis",
+        description="Enter a review and get its sentiment prediction.",
+    )
+    iface.launch()
+
+def model():
+    if not Path(TRAIN_DATA_PATH).exists() or not Path(TEST_DATA_PATH).exists():
+        raise FileNotFoundError(
+            "Training or testing data not found. Download the data using 'make download' and try again.")
+    train_data = load_data(TRAIN_DATA_PATH)
+    pipeline = get_pipeline()
+    print("\n\nFitting pipeline...")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        pipeline.fit(train_data['review'], train_data['label'])
+    test_model(pipeline)
+    save_model(pipeline)
 
 
 if __name__ == '__main__':
@@ -62,15 +98,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.mode == 'model':
-        if not Path(TRAIN_DATA_PATH).exists() or not Path(TEST_DATA_PATH).exists():
-            raise FileNotFoundError(
-                "Training or testing data not found. Download the data using 'make download' and try again.")
-        train_data = load_data(TRAIN_DATA_PATH)
-        pipeline = get_pipeline()
-        print("\n\nFitting pipeline...")
-        pipeline.fit(train_data['review'], train_data['label'])
-        test_model(pipeline)
-        save_model(pipeline)
+        model()
     elif args.mode == 'gui':
         gui()
     else:
