@@ -13,6 +13,7 @@ Logistic Regression model.
     - [GUI](#gui)
     - [Prediction](#prediction)
     - [Training the Model](#training-the-model)
+    - [Help](#help)
 - [Model Details](#model-details)
     - [Preprocessing Pipeline](#preprocessing-pipeline)
     - [Classifier](#classifier)
@@ -91,6 +92,14 @@ make model
 This command trains and tests the model using `data/train.csv` and `data/test.csv,` saving the trained model
 to `model/model.pkl`.
 
+### Help
+
+To see all available commands, use the following command:
+
+```bash
+make help
+```
+
 ## Model Details
 
 ### Preprocessing Pipeline
@@ -137,8 +146,6 @@ The model was evaluated using the following metrics:
 |-----------------|--------------------|--------------------|
 | Actual Negative | 230476             | 29524              |
 | Actual Positive | 28821              | 231179             |
-
-| Actual Positive | 28821 | 231179 |
 
 ## License
 
