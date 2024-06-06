@@ -165,7 +165,7 @@ cython_debug/
 /data/raw/*
 /data/processed/*
 /cache/*
-!/cache/.gitkeep
+/flagged/*
 
 data/*.csv
 model/*.pkl
