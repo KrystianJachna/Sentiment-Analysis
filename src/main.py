@@ -15,6 +15,7 @@ from const import MAX_FEATURES, CACHE_DIR, MODEL_PATH, TRAIN_DATA_PATH, TEST_DAT
 from preprocessing.DataCleaner import DataCleaner
 from preprocessing.Stemmer import Stemmer
 
+# Ensure NLTK 'punkt' tokenizer is available
 if not nltk.data.find('tokenizers/punkt'):
     nltk.download('punkt')
 
@@ -31,7 +32,7 @@ def load_data(path: Path) -> pd.DataFrame:
     return data
 
 
-def get_pipeline():
+def create_pipeline() -> Pipeline:
     """
     Create a pipeline with the following steps:
     1. DataCleaner: Preprocess the data by cleaning the text.
@@ -44,7 +45,7 @@ def get_pipeline():
     return Pipeline([
         ('cleaner', DataCleaner()),
         ('stemmer', Stemmer()),
-        ('vectorizer', CountVectorizer(ngram_range=((1, 2)), max_features=MAX_FEATURES)),
+        ('vectorizer', CountVectorizer(ngram_range=(1, 2), max_features=MAX_FEATURES)),
         ('tfidf', TfidfTransformer()),
         ('classifier', LogisticRegression(max_iter=1000, solver='liblinear', penalty='l2', C=7.9, n_jobs=-1, verbose=1))
     ],
@@ -53,9 +54,9 @@ def get_pipeline():
     )
 
 
-def test_model(model):
+def evaluate_model(model: Pipeline):
     """
-    Test the model using the test data and print the accuracy, precision, recall, f1 score, and confusion matrix.
+    Test the model using the test data and print the accuracy, precision, recall, F1 score, and confusion matrix.
     """
     print("Testing model...")
     test_data = load_data(TEST_DATA_PATH)
@@ -67,7 +68,7 @@ def test_model(model):
     print(f"Confusion Matrix:\n{metrics.confusion_matrix(test_data['label'], y_pred)}")
 
 
-def save_model(model):
+def save_model(model: Pipeline):
     """
     Save the model to the MODEL_PATH using pickle.
     """
@@ -76,7 +77,7 @@ def save_model(model):
         pickle.dump(model, file)
 
 
-def load_model():
+def load_model() -> Pipeline:
     """
     Load the model from the MODEL_PATH using pickle.
     """
@@ -85,15 +86,30 @@ def load_model():
         return pickle.load(file)
 
 
-def classify_review(model, review):
+def preprocess_review(review: pd.Series) -> str:
+    """
+    Preprocess the review using DataCleaner and Stemmer.
+    """
+    cleaner = DataCleaner()
+    stemmer = Stemmer()
+    cleaned_review = cleaner.transform(review)
+    stemmed_review = stemmer.transform(cleaned_review)
+    return stemmed_review[0]
+
+
+def classify_review(model: Pipeline, review: str) -> str:
     """
     Classify the given review using the model.
     """
     review_series = pd.Series([review])
-    return model.predict(review_series)[0]
+    preprocessed_review = preprocess_review(review_series)
+    if not preprocessed_review.strip():
+        return "Review is too general or empty after preprocessing. Please provide a more detailed review."
+    pred = model.predict(review_series)[0]
+    return "Positive ✅" if pred == 1 else "Negative ⛔"
 
 
-def gui():
+def run_gui():
     """
     Run the GUI using gradio to classify the sentiment of a review.
     """
@@ -101,19 +117,22 @@ def gui():
         raise FileNotFoundError("Model not found. Train the model using 'make model' and try again.")
     model = load_model()
     iface = gr.Interface(
-        fn=lambda review: "Positive ✅" if classify_review(model, review) == 1 else "Negative ⛔",
+        fn=lambda review: classify_review(model, review),
         inputs=gr.Textbox(lines=2, placeholder="Enter a review here..."),
         outputs="text",
         title="Sentiment Analysis",
         description="Enter a review and get its sentiment prediction.",
-        examples=["Definitely worth the price.", "This product is amazing!", "I hate this product!",
-                  "I will never buy this again.",
-                  ],
+        examples=[
+            "Definitely worth the price.",
+            "This product is amazing!",
+            "I hate this product!",
+            "I will never buy this again.",
+        ],
     )
     iface.launch(share=True)
 
 
-def train_model():
+def train_and_save_model():
     """
     Train the model using the training data and save it to the MODEL_PATH.
     """
@@ -121,33 +140,39 @@ def train_model():
         raise FileNotFoundError(
             "Training or testing data not found. Download the data using 'make download' and try again.")
     train_data = load_data(TRAIN_DATA_PATH)
-    pipeline = get_pipeline()
+    pipeline = create_pipeline()
     print("Fitting pipeline...")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         pipeline.fit(train_data['review'], train_data['label'])
-    test_model(pipeline)
+    evaluate_model(pipeline)
     save_model(pipeline)
 
 
-# Run the model or GUI based on the argument provided
-if __name__ == '__main__':
+def main():
+    """
+    Main function to run the script based on the provided mode.
+    """
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", help="Specify 'model' to train and save the model, 'gui' to run the GUI, or 'predict' to classify a review.")
+    parser.add_argument("mode",
+                        help="Specify 'model' to train and save the model, 'gui' to run the GUI, or 'predict' to classify a review.")
     parser.add_argument("--review", help="Review text to predict sentiment for, used with 'predict' mode.")
     args = parser.parse_args()
 
     if args.mode == 'model':
-        train_model()
+        train_and_save_model()
     elif args.mode == 'gui':
-        gui()
+        run_gui()
     elif args.mode == 'predict':
         if args.review is None:
             print("Please provide a review for prediction.")
         else:
             model = load_model()
             prediction = classify_review(model, args.review)
-            sentiment = "Positive :)" if prediction == 1 else "Negative :("
-            print(f"Review: {args.review}\nSentiment: {sentiment}")
+            print(f"Review: {args.review}\nSentiment: {prediction}")
     else:
         print("Invalid argument. Please specify either 'model', 'gui', or 'predict'.")
+
+
+if __name__ == '__main__':
+    main()
