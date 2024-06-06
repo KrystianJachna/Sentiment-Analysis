@@ -1,5 +1,6 @@
 import pickle
 import warnings
+from pathlib import Path
 
 import nltk
 import pandas as pd
@@ -7,9 +8,8 @@ from sklearn import metrics
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from pathlib import Path
 
-from const import MAX_FEATURES, CACHE_DIR, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH
+from const import MAX_FEATURES, CACHE_DIR, MODEL_PATH
 from data_loader import load_data
 from preprocessing.DataCleaner import DataCleaner
 from preprocessing.Stemmer import Stemmer
@@ -17,6 +17,7 @@ from preprocessing.Stemmer import Stemmer
 # Ensure the 'punkt' tokenizer is available
 if not nltk.data.find('tokenizers/punkt'):
     nltk.download('punkt')
+
 
 class SentimentModel:
     def __init__(self):
@@ -26,13 +27,13 @@ class SentimentModel:
         """
         Creates a pipeline with data preprocessing and classification steps.
         """
-        print("Creating pipeline...")
         return Pipeline([
             ('cleaner', DataCleaner()),
             ('stemmer', Stemmer()),
             ('vectorizer', CountVectorizer(ngram_range=(1, 2), max_features=MAX_FEATURES)),
             ('tfidf', TfidfTransformer()),
-            ('classifier', LogisticRegression(max_iter=1000, solver='liblinear', penalty='l2', C=7.9, n_jobs=-1, verbose=1))
+            ('classifier',
+             LogisticRegression(max_iter=1000, solver='liblinear', penalty='l2', C=7.9, n_jobs=-1, verbose=1))
         ],
             verbose=True,
             memory=CACHE_DIR
@@ -81,7 +82,7 @@ class SentimentModel:
         with open(model_path, 'rb') as file:
             self.pipeline = pickle.load(file)
 
-    def preprocess_review(self, review: pd.Series) -> str:
+    def _preprocess_review(self, review: pd.Series) -> str:
         """
         Preprocesses a review using DataCleaner and Stemmer.
         """
@@ -96,7 +97,7 @@ class SentimentModel:
         Classifies a given review using the model.
         """
         review_series = pd.Series([review])
-        preprocessed_review = self.preprocess_review(review_series)
+        preprocessed_review = self._preprocess_review(review_series)
         if not preprocessed_review.strip():
             return "Review is too general or empty after preprocessing. Please provide a more detailed review."
         pred = self.pipeline.predict(review_series)[0]
